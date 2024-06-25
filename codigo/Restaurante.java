@@ -25,11 +25,8 @@ public class Restaurante {
     }
 
     private void inicializarMesas() {
-        // 4 mesas de 4 lugares (IDs de 1 a 4)
         mesas.addAll(criarMesas(1, 4, 4));
-        // 4 mesas de 6 lugares (IDs de 5 a 8)
         mesas.addAll(criarMesas(5, 8, 6));
-        // 2 mesas de 8 lugares (IDs de 9 a 10)
         mesas.addAll(criarMesas(9, 10, 8));
     }
 
@@ -114,8 +111,8 @@ public class Restaurante {
                 .findFirst();
     }
 
-    public void adicionarItemAoPedido(Requisicao requisicao, int id) {
-        Optional<Item> itemOpt = cardapio.buscarItemPorId(id);
+    public void adicionarItemAoPedido(Requisicao requisicao, int itemId) {
+        Optional<Item> itemOpt = cardapio.buscarItemPorId(itemId);
         if (itemOpt.isPresent()) {
             requisicao.adicionarItemAoPedido(itemOpt.get());
         } else {
@@ -131,7 +128,9 @@ public class Restaurante {
 
     public void encerrarAtendimento(Requisicao requisicao) {
         requisicao.getMesa().setDisponivel(true);
+        requisicao.encerrar();
         requisicoesAtivas.remove(requisicao);
+        System.out.println(requisicao.gerarRelatorio());
     }
 
     @Override

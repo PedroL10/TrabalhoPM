@@ -1,6 +1,7 @@
 package codigo;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Requisicao {
     private Mesa mesa;
@@ -48,14 +49,29 @@ public class Requisicao {
         return saida;
     }
 
-    public void setSaida(LocalDateTime saida) {
-        this.saida = saida;
+    public void encerrar() {
+        this.saida = LocalDateTime.now();
     }
 
     public void adicionarItemAoPedido(Item item) {
         pedido.adicionarItem(item);
     }
 
+    public String gerarRelatorio() {
+        double valorTotal = pedido.calcularValorTotalComTaxa();
+        double valorPorPessoa = pedido.calcularValorPorPessoa(numeroDePessoas);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return "Relatório da Requisição:\n" +
+               "Data de Chegada: " + chegada.format(formatter) + "\n" +
+               "Cliente: " + cliente.getNome() + "\n" +
+               "Quantidade de Pessoas: " + numeroDePessoas + "\n" +
+               "Itens Pedidos:\n" + pedido.listarItens() +
+               "Valor da Conta (com 10% de taxa): R$ " + String.format("%.2f", valorTotal) + "\n" +
+               "Valor da Conta por Pessoa: R$ " + String.format("%.2f", valorPorPessoa) + "\n" +
+               "Horário de Saída: " + (saida != null ? saida.format(formatter) : "N/A") + "\n";
+    }
+    
     @Override
     public String toString() {
         return "Requisicao{" +
