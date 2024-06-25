@@ -4,45 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pedido {
+    private final List<Item> itens;
 
-    private final double TAXA = 0.1;
-    private boolean menuFechado;   
-
-    private List<Item> itemsEscolhidos;
-
-    public Pedido(boolean menuFechado) {
-        this.itemsEscolhidos = new ArrayList<>();
-        this.menuFechado = menuFechado;
-    }    
-
-    public List<Item> getItemsEscolhidos() {
-        return itemsEscolhidos;
+    public Pedido() {
+        this.itens = new ArrayList<>();
     }
 
-    public void pedirItem(Item pedido) {
-        itemsEscolhidos.add(pedido);
+    public void adicionarItem(Item item) {
+        itens.add(item);
     }
 
-    public boolean isMenuFechado() {
-        return menuFechado;
+    @Override
+    public String toString() {
+        return "Pedido{" +
+               "itens=" + itens +
+               '}';
     }
-
-    public double valorAPagar() {
-        double valorTotal = 0.0;
-
-        for (Item item : itemsEscolhidos) {
-            valorTotal += item.getPreco();
-        }
-
-        if(!menuFechado){
-            valorTotal += valorTotal * TAXA;
-        }
-        return valorTotal;
-    }
-
-    public double calcularValorPorPessoa(int numeroDePessoas) {
-        return valorAPagar() / numeroDePessoas;
-    }
-
-        
 }

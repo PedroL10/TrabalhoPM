@@ -1,27 +1,37 @@
 package codigo;
 
 public class Item {
+    private final String descricao;
+    private final double preco;
+    private final int id;
 
-    private String nome;
-    private double preco;
-    private int identificador;
-
-    public Item(String nome, double preco, int identificador) {
-        this.nome = nome;
+    public Item(String descricao, double preco, int id) {
+        if (descricao == null || descricao.isEmpty()) {
+            throw new IllegalArgumentException("Descrição não pode ser vazia.");
+        }
+        if (preco < 0) {
+            throw new IllegalArgumentException("Preço não pode ser negativo.");
+        }
+        this.descricao = descricao;
         this.preco = preco;
-        this.identificador = identificador;
+        this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getDescricao() {
+        return descricao;
     }
 
     public double getPreco() {
         return preco;
     }
 
-    public int getIdentificador() {
-        return identificador;
+    public int getId() {
+        return id;
     }
 
+    @Override
+    public String toString() {
+        return descricao + '\'' +
+               " -  preco: R$ " + preco ;          
+    }
 }

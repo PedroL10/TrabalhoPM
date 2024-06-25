@@ -1,155 +1,169 @@
 package codigo;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         Cardapio cardapio = new Cardapio();
         Restaurante restaurante = new Restaurante(cardapio);
-     
-        int opcao;
+        List<Requisicao> filaDeEspera = new ArrayList<>();
 
-        do {
-            System.out.println("Menu:");
-            System.out.println("1. Atender Cliente");
-            System.out.println("2. Ver Fila de Espera");
-            System.out.println("3. Servir Cliente");
-            System.out.println("4. Encerrar Atendimento de Cliente");
-            System.out.println("5. Sair");
-            System.out.print("Escolha uma opção: ");
-            opcao = scanner.nextInt();
-            scanner.nextLine();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            exibirMenu();
+
+            int opcao = scanner.nextInt();
+            scanner.nextLine(); // Consumir a quebra de linha após o nextInt
 
             switch (opcao) {
                 case 1:
-                    System.out.print("Nome do Cliente: ");
-                    String nome = scanner.nextLine();
-                    System.out.print("Número de Pessoas: ");
-                    int numeroPessoas = scanner.nextInt();
-                    scanner.nextLine();
-                    try {
-                        Cliente cliente = new Cliente(nome);
-                        Requisicao requisicao = new Requisicao(numeroPessoas, cliente);
-                        restaurante.adicionarRequisicao(requisicao);
-                        if (requisicao.getMesa() != null) {
-                            System.out.println("Cliente " + cliente.getNome() + " adicionado com sucesso! Mesa: "
-                                    + requisicao.getMesa().getIdMesa());
-                        } else {
-                            System.out.println("Cliente " + cliente.getNome() + " adicionado à fila de espera.");
-                        }
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Erro: " + e.getMessage());
-                    }
+                    atenderCliente(restaurante, filaDeEspera, scanner);
                     break;
+
                 case 2:
-                    System.out.println("Fila de Espera:");
-                    Queue<Requisicao> filaEspera = restaurante.getFilaEspera();
-                    if (filaEspera.isEmpty()) {
-                        System.out.println("Nenhum cliente na fila de espera.");
-                    } else {
-                        for (Requisicao req : filaEspera) {
-                            System.out.println("Cliente: " + req.getCliente().getNome() + ", Número de Pessoas: "
-                                    + req.getQuantidadeDePessoas());
-                        }
-                    }
+                    verFilaDeEspera(filaDeEspera);
                     break;
+
                 case 3:
-                    System.out.println("Escolha uma mesa para servir o cliente:");
-                    int numeroMesa = scanner.nextInt();
-                    scanner.nextLine();
-
-                    if (!restaurante.verificarMesaExistente(numeroMesa)) {
-                        System.out.println("Mesa não existe.");
-                        break;
-                    }
-
-                    if (!restaurante.verificarMesaOcupada(numeroMesa)) {
-                        System.out.println("A mesa escolhida não está ocupada.");
-                        break;
-                    }
-
-                    System.out.println("Opções do Cardápio:");
-                    List<Item> itensCardapio = restaurante.obterItensCardapio();
-                    for (Item item : itensCardapio) {
-                        System.out
-                                .println(item.getIdentificador() + ". " + item.getNome() + " - R$ " + item.getPreco());
-                    }
-
-                    Pedido pedido = new Pedido(false);
-                    boolean continuarPedindo = true;
-                    // tirar esse do while
-                    do {
-                        System.out.println("Digite o código do item desejado (0 para encerrar):");
-                        int codigoItem = scanner.nextInt();
-                        scanner.nextLine();
-
-                        if (codigoItem == 0) {
-                            continuarPedindo = false;
-                        } else {
-                            Item item = restaurante.obterItemCardapio(codigoItem);
-                            if (item != null) {
-                                pedido.pedirItem(item);
-                                System.out.println("Item adicionado ao pedido: " + item.getNome());
-                            } else {
-                                System.out.println("Item não encontrado.");
-                            }
-                        }
-                    } while (continuarPedindo);
-
-                    restaurante.servirCliente(numeroMesa, pedido);
-                    System.out.println("Pedido realizado com sucesso.");
+                    servirCliente(restaurante, filaDeEspera, scanner);
                     break;
 
                 case 4:
-                    System.out.println("Mesas Ocupadas:");
-                    List<Mesa> mesasOcupadas = restaurante.getMesasOcupadas();
-                    if (mesasOcupadas.isEmpty()) {
-                        System.out.println("Nenhuma mesa ocupada.");
-                    } else {
-                        for (int i = 0; i < mesasOcupadas.size(); i++) {
-                            Mesa mesaOcupada = mesasOcupadas.get(i);
-                            Requisicao req = mesaOcupada.getRequisicaoAtual();
-                            System.out.println((i + 1) + ". Mesa para " + mesaOcupada.getQuantidadeDeCadeiras()
-                                    + " pessoas ocupada por " + req.getCliente().getNome());
-                        }
-                        System.out.print("Escolha uma mesa para liberar (1-" + mesasOcupadas.size() + "): ");
-                        int indiceMesa = scanner.nextInt();
-                        scanner.nextLine();
-                        if (indiceMesa > 0 && indiceMesa <= mesasOcupadas.size()) {
-                            Mesa mesaEscolhida = mesasOcupadas.get(indiceMesa - 1);
-                            Requisicao req = mesaEscolhida.getRequisicaoAtual();
-                            if (req != null) {
-                                restaurante.liberarMesa(mesaEscolhida);
-                                System.out.println("Mesa liberada com sucesso!");
-                                System.out.println("Relatório de Atendimento:");
-                                System.out.println(req.relatorioAtendimento());
-                                List<Pedido> pedidos = req.getPedidos();
-                                for (Pedido p : pedidos) {
-                                    System.out.println("Pedido:");
-                                    for (Item item : p.getItemsEscolhidos()) {
-                                        System.out.println(" - " + item.getNome() + ", Preço: R$" + item.getPreco());
-                                    }
-                                    System.out.println("Menu fechado: " + p.isMenuFechado());
-                                }
-                            } else {
-                                System.out.println("Nenhuma requisição encontrada para esta mesa.");
-                            }
-                        } else {
-                            System.out.println("Opção inválida.");
-                        }
-                    }
+                    encerrarAtendimento(restaurante, filaDeEspera, scanner);
                     break;
+
                 case 5:
                     System.out.println("Saindo...");
-                    break;
+                    scanner.close();
+                    return;
+
                 default:
                     System.out.println("Opção inválida. Tente novamente.");
             }
-        } while (opcao != 5);
+        }
+    }
 
-        scanner.close();
+    private static void exibirMenu() {
+        System.out.println("Menu:");
+        System.out.println("1. Atender Cliente");
+        System.out.println("2. Ver Fila de Espera");
+        System.out.println("3. Servir Cliente");
+        System.out.println("4. Encerrar Atendimento de Cliente");
+        System.out.println("5. Sair");
+        System.out.print("Escolha uma opção: ");
+    }
+
+    private static void atenderCliente(Restaurante restaurante, List<Requisicao> filaDeEspera, Scanner scanner) {
+        System.out.print("Digite o ID do cliente: ");
+        int clienteId = scanner.nextInt();
+        scanner.nextLine(); // Consumir a quebra de linha após o nextInt
+
+        System.out.print("Digite o nome do cliente: ");
+        String nomeCliente = scanner.nextLine();
+
+        Cliente cliente = new Cliente(clienteId, nomeCliente);
+        restaurante.registrarCliente(cliente);
+
+        System.out.print("Digite o número de pessoas: ");
+        int numeroDePessoas = scanner.nextInt();
+        scanner.nextLine(); // Consumir a quebra de linha após o nextInt
+
+        Optional<Mesa> mesaOpt = restaurante.buscarMesaDisponivel(numeroDePessoas);
+        if (mesaOpt.isPresent()) {
+            Requisicao requisicao = restaurante.criarRequisicao(mesaOpt.get().getId(), cliente.getId(),
+                    numeroDePessoas);
+            restaurante.adicionarRequisicao(requisicao);
+            System.out.println("Cliente atendido e sentado na mesa " + mesaOpt.get().getId());
+            System.out.println(cliente.getId());
+            System.out.println(requisicao.toString());
+        } else {
+            filaDeEspera.add(new Requisicao(null, cliente, numeroDePessoas));
+            System.out.println("Nenhuma mesa disponível no momento. Cliente adicionado à fila de espera.");
+        }
+    }
+
+    private static void verFilaDeEspera(List<Requisicao> filaDeEspera) {
+        System.out.println("Fila de Espera:");
+        filaDeEspera.forEach(System.out::println);
+    }
+
+    private static void servirCliente(Restaurante restaurante, List<Requisicao> filaDeEspera, Scanner scanner) {
+        System.out.println("Cardápio:");
+        restaurante.exibirCardapio();
+    
+        System.out.print("Digite o ID do cliente a ser servido: ");
+        int clienteIdParaServir = scanner.nextInt();
+        scanner.nextLine(); // Consumir a quebra de linha após o nextInt
+    
+        boolean clienteServido = false;
+    
+        // Verificar na fila de espera
+        Optional<Requisicao> requisicaoOpt = filaDeEspera.stream()
+                .filter(req -> req.getCliente().getId() == clienteIdParaServir)
+                .findFirst();
+    
+        if (requisicaoOpt.isPresent()) {
+            Requisicao requisicao = requisicaoOpt.get();
+    
+            System.out.print("Digite o ID do item a ser adicionado ao pedido: ");
+            int itemId = scanner.nextInt();
+            scanner.nextLine(); // Consumir a quebra de linha após o nextInt
+    
+            try {
+                requisicao.adicionarItem(itemId);
+                System.out.println("Item adicionado ao pedido.");
+                clienteServido = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            // Verificar em todas as mesas do restaurante se o cliente está alocado
+            Optional<Requisicao> requisicaoMesaOpt = restaurante.getRequisicoesEmMesas().stream()
+                    .filter(r -> r.getCliente().getId() == clienteIdParaServir)
+                    .findFirst();
+    
+            if (requisicaoMesaOpt.isPresent()) {
+                Requisicao requisicao = requisicaoMesaOpt.get();
+    
+                System.out.print("Digite o ID do item a ser adicionado ao pedido: ");
+                int itemId = scanner.nextInt();
+                scanner.nextLine(); // Consumir a quebra de linha após o nextInt
+    
+                try {
+                    requisicao.adicionarItem(itemId);
+                    System.out.println("Item adicionado ao pedido.");
+                    clienteServido = true;
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+    
+        if (!clienteServido) {
+            System.out.println("Cliente não encontrado ou não está alocado em uma mesa.");
+        }
+    }
+    
+    private static void encerrarAtendimento(Restaurante restaurante, List<Requisicao> filaDeEspera, Scanner scanner) {
+        System.out.print("Digite o ID do cliente a encerrar atendimento: ");
+        int clienteIdParaEncerrar = scanner.nextInt();
+        scanner.nextLine(); // Consumir a quebra de linha após o nextInt
+
+        Optional<Requisicao> requisicaoParaEncerrarOpt = filaDeEspera.stream()
+                .filter(r -> r.getCliente().getId() == clienteIdParaEncerrar)
+                .findFirst();
+
+        if (requisicaoParaEncerrarOpt.isPresent()) {
+            Requisicao requisicaoParaEncerrar = requisicaoParaEncerrarOpt.get();
+            restaurante.encerrarAtendimento(requisicaoParaEncerrar);
+            filaDeEspera.remove(requisicaoParaEncerrar);
+            System.out.println("Atendimento encerrado para o cliente.");
+        } else {
+            System.out.println("Cliente não encontrado na fila de espera.");
+        }
     }
 }

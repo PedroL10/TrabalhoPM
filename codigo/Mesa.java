@@ -1,64 +1,38 @@
 package codigo;
 
-class Mesa {
-    private static int contador = 1;
+public class Mesa {
+    private final int id;
+    private final int capacidade;
+    private boolean disponivel;
 
-    private int IdMesa;
-
-    private int quantidadeDeCadeiras;
-    private boolean mesaOcupada;
-
-    // remover requisicao daqui
-    private Requisicao requisicaoAtual;
-    private Pedido pedido;
-
-    public Mesa(int quantidadeDeCadeiras) {
-        this.IdMesa = contador;
-        this.quantidadeDeCadeiras = quantidadeDeCadeiras;
-        this.mesaOcupada = false;
-        this.requisicaoAtual = null;
-        this.pedido = null;
-        contador++;
+    public Mesa(int id, int capacidade) {
+        this.id = id;
+        this.capacidade = capacidade;
+        this.disponivel = true;
     }
 
-    public int getQuantidadeDeCadeiras() {
-        return quantidadeDeCadeiras;
+    public int getId() {
+        return id;
     }
 
-    public void setQuantidadeDeCadeiras(int quantidadeDeCadeiras) {
-        this.quantidadeDeCadeiras = quantidadeDeCadeiras;
+    public int getCapacidade() {
+        return capacidade;
     }
 
-    public Requisicao getRequisicaoAtual() {
-        return requisicaoAtual;
+    public boolean isDisponivel() {
+        return disponivel;
     }
 
-    public void setRequisicaoAtual(Requisicao requisicaoAtual) {
-        this.requisicaoAtual = requisicaoAtual;
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
     }
 
-    public int getIdMesa() {
-        return IdMesa;
+    @Override
+    public String toString() {
+        return "Mesa{" +
+               "id=" + id +
+               ", capacidade=" + capacidade +
+               ", disponivel=" + disponivel +
+               '}';
     }
-
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
-
-    public boolean isMesaOcupada() {
-        return mesaOcupada;
-    }
-
-    public void ocuparMesa() {
-        mesaOcupada = true;
-    }
-
-    public void desocuparMesa() {
-        mesaOcupada = false;
-    }
-
 }

@@ -1,22 +1,11 @@
 package codigo;
 
-class Cliente {
+public class Cliente {
+    private final int id;
+    private final String nome;
 
-    private static int idAutomatico = 1;
-    private String nome;
-    private int id;
-
-    public Cliente(String nome) {
-        this.nome = nome;
-        this.id = idAutomatico;
-        idAutomatico++;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
+    public Cliente(int id, String nome) {
+        this.id = id;
         this.nome = nome;
     }
 
@@ -24,8 +13,15 @@ class Cliente {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getNome() {
+        return nome;
     }
-   
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+               "id=" + id +
+               ", nome='" + nome + '\'' +
+               '}';
+    }
 }
